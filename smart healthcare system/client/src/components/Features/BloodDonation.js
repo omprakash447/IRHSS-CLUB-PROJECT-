@@ -109,7 +109,7 @@ function BloodDonation() {
         return;
       }
 
-      const submitResponse = await fetch('http://localhost:2000/blood/request', {
+      const submitResponse = await fetch('http://localhost:2000/api/blood-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

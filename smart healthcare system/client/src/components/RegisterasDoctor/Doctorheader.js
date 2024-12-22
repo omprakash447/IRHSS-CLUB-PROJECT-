@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaAmbulance, FaBars, FaBriefcaseMedical, FaHandHoldingHeart, FaSignOutAlt, FaTachometerAlt, FaUser } from 'react-icons/fa';
+import { FaAmbulance, FaBars, FaBriefcaseMedical, FaHandHoldingHeart, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Doctorheader() {
@@ -137,25 +137,19 @@ function Doctorheader() {
         >
           <ul className="list-unstyled p-3">
             <li>
-              <Link to="/doctor-screen" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
-                <FaTachometerAlt className="me-2" />
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link to="/blood-donation" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link to="/blood-donations-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
                 <FaHandHoldingHeart className="me-2" />
                 Blood Donations
               </Link>
             </li>
             <li>
-              <Link to="/blood-requests" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link to="/blood-requests-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
                 <FaBriefcaseMedical className="me-2" />
                 Blood Requests
               </Link>
             </li>
             <li>
-              <Link to="/emergency-cases" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link to="/accident-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
                 <FaAmbulance className="me-2" />
                 Accidents / Emergencies
               </Link>
