@@ -128,55 +128,79 @@ const Blood = mongoose.model("Blood", BloodSchema);
 
 
 // separate schema for the bloodrequest , bcz our original schema not working
-const BloodRequestSchema = new mongoose.Schema({
+const bloodRequestSchema = new mongoose.Schema({
   bloodType: { type: String, required: true },
   quantity: { type: Number, required: true },
   patientName: { type: String, required: true },
-  patientContact: { type: String, required: true },
-  priority: { type: String, enum: ['Normal', 'High'], default: 'Normal' },
+  location: { type: String, required: true },
+  contact: { type: String, required: true },
+  priority: { type: String, default: 'Normal' },
   requestedAt: { type: Date, default: Date.now },
+  status: { type: String, default: 'Pending' }  // Added 'status' field with default 'Pending'
 });
 
+const BloodRequest = mongoose.model('BloodRequest', bloodRequestSchema);
 
-const BloodRequest = mongoose.model('BloodRequest', BloodRequestSchema);
 
-// addition of blood request
-server.post('/api/blood-requests', async (req, res) => {
+
+// Endpoint to create a new blood request
+server.post('/api/request-blood', async (req, res) => {
   try {
-    const { bloodType, quantity, location, name, contact, priority } = req.body;
-    // Ensure all fields are provided
-    if (!bloodType || !quantity || !location || !name || !contact || !priority) {
-      return res.status(400).json({ error: 'All fields are required.' });
-    }
+    const {
+      bloodType,
+      quantity,
+      patientName,
+      location,
+      contact,
+      priority,
+    } = req.body;
 
     const newRequest = new BloodRequest({
       bloodType,
       quantity,
+      patientName,
       location,
-      name,
       contact,
       priority,
     });
 
     await newRequest.save();
-    res.status(201).json({ message: 'Blood request submitted successfully.', data: newRequest });
-  } catch (error) {
-    console.error('Error saving request:', error);
-    res.status(500).json({ error: 'Server error while submitting request.' });
+    res.status(201).json({ message: 'Blood request created successfully', newRequest });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'An error occurred while creating the blood request' });
   }
 });
-
-
-// Get all blood requests
-server.get('/api/blood-requests', async (_req, res) => {
+// Endpoint to get all blood requests
+server.get('/api/request-blood', async (_req, res) => {
   try {
-    const requests = await BloodRequest.find().sort({ requestedAt: -1 });
+    const requests = await BloodRequest.find();
     res.status(200).json(requests);
-  } catch (error) {
-    console.error('Error fetching blood requests:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'An error occurred while fetching blood requests' });
   }
 });
+server.patch('/api/mark-request-accessed/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedRequest = await BloodRequest.findByIdAndUpdate(
+      id,
+      { status: 'Accessed' },  // Update status field
+      { new: true }  // Return the updated document
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    res.json(updatedRequest);  // Send back the updated request
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 
 
