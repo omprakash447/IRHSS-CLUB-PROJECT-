@@ -127,30 +127,114 @@ const BloodSchema = new mongoose.Schema({
 const Blood = mongoose.model("Blood", BloodSchema);
 
 
+// separate schema for the bloodrequest , bcz our original schema not working
+const BloodRequestSchema = new mongoose.Schema({
+  bloodType: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  patientName: { type: String, required: true },
+  patientContact: { type: String, required: true },
+  priority: { type: String, enum: ['Normal', 'High'], default: 'Normal' },
+  requestedAt: { type: Date, default: Date.now },
+});
+
+
+const BloodRequest = mongoose.model('BloodRequest', BloodRequestSchema);
+
+// addition of blood request
+server.post('/api/blood-requests', async (req, res) => {
+  try {
+    const { bloodType, quantity, location, name, contact, priority } = req.body;
+    // Ensure all fields are provided
+    if (!bloodType || !quantity || !location || !name || !contact || !priority) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    const newRequest = new BloodRequest({
+      bloodType,
+      quantity,
+      location,
+      name,
+      contact,
+      priority,
+    });
+
+    await newRequest.save();
+    res.status(201).json({ message: 'Blood request submitted successfully.', data: newRequest });
+  } catch (error) {
+    console.error('Error saving request:', error);
+    res.status(500).json({ error: 'Server error while submitting request.' });
+  }
+});
+
+
+// Get all blood requests
+server.get('/api/blood-requests', async (_req, res) => {
+  try {
+    const requests = await BloodRequest.find().sort({ requestedAt: -1 });
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error('Error fetching blood requests:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 // accident schema
 const accidentSchema = new mongoose.Schema({
   location: String,
+  city: { type: String, required: true },  // New field for city
+  state: { type: String, required: true }, // New field for state
   description: String,
   status: { type: String, enum: ['Pending', 'Checkout'], default: 'Pending' },
   time: { type: Date, default: Date.now },
 });
+
 const Accident = mongoose.model('Accident', accidentSchema);
+
+// update the accident checkout from the doctor page...
+server.put('/api/accidents/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Update accident in database
+    const updatedAccident = await Accident.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedAccident) {
+      return res.status(404).send('Accident not found');
+    }
+
+    res.json(updatedAccident);
+  } catch (error) {
+    console.error('Error updating accident:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
 
 
 
 
 // POST route to add a new accident
 server.post('/api/accidents', async (req, res) => {
-  const { location, description } = req.body;
+  const { location, description, city, state } = req.body;
   try {
-    const newAccident = new Accident({ location, description });
+    const newAccident = new Accident({ location, description, city, state });
     await newAccident.save();
-    res.status(201).json(newAccident); // Return the created accident data
+    res.status(201).json(newAccident);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error saving accident' });
   }
 });
+
+
 
 
 // GET route to fetch all accidents
@@ -159,9 +243,13 @@ server.get('/api/accidents', async (_req, res) => {
     const accidents = await Accident.find();
     res.json({ accidents });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error fetching accidents' });
   }
 });
+
+
+
 
 // Update accident status
 server.put('/api/accidents/:id', async (req, res) => {
@@ -484,6 +572,9 @@ server.get("/blood/match", async (_req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 server.post("/blood/request/check-availability", async (req, res) => {
   try {
     const { bloodType, quantity } = req.body;
