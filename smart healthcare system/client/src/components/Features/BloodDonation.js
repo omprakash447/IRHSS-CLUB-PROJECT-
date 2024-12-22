@@ -14,17 +14,13 @@ function BloodDonation() {
   // State for Request Blood form
   const [requestBloodType, setRequestBloodType] = useState('');
   const [requestQuantity, setRequestQuantity] = useState('');
-  const [requestLocation] = useState('');
+  const [requestLocation, setRequestLocation] = useState('');
   const [patientName, setPatientName] = useState('');
   const [patientContact, setPatientContact] = useState('');
   const [priority, setPriority] = useState('');
 
-  // State to hold donation and request data
-  const [, setDonations] = useState([]);
+  // State to hold request data
   const [, setRequests] = useState([]);
-
-
-;
 
   // Handle Donation
   const handleDonation = async (e) => {
@@ -55,11 +51,6 @@ function BloodDonation() {
       } else {
         const result = await response.json();
         toast.success(result.message || 'Thank you for your donation!');
-        const donationResponse = await fetch('http://localhost:2000/blood/donations', { credentials: 'include' });
-        if (donationResponse.ok) {
-          const donationData = await donationResponse.json();
-          setDonations(donationData);
-        }
       }
     } catch (err) {
       console.error('Error during donation:', err);
@@ -75,41 +66,13 @@ function BloodDonation() {
       bloodType: requestBloodType,
       quantity: requestQuantity,
       location: requestLocation,
-      name: patientName,
+      patientName: patientName,
       contact: patientContact,
-      priority,
+      priority: priority,
     };
 
     try {
-      const availabilityResponse = await fetch('http://localhost:2000/blood/request/check-availability', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bloodType: requestBloodType,
-          quantity: requestQuantity,
-        }),
-        credentials: 'include',
-      });
-
-      if (!availabilityResponse.ok) {
-        const error = await availabilityResponse.json();
-        console.error('Availability Error:', error);
-        toast.error(error.error || 'Failed to check blood availability.');
-        return;
-      }
-
-      const availabilityResult = await availabilityResponse.json();
-
-      if (availabilityResult.available) {
-        toast.success(`The requested blood (${requestBloodType}, ${requestQuantity} ml) is available.`);
-      } else {
-        toast.error(`The requested blood (${requestBloodType}, ${requestQuantity} ml) is not available.`);
-        return;
-      }
-
-      const submitResponse = await fetch('http://localhost:2000/api/blood-requests', {
+      const response = await fetch('http://localhost:2000/api/request-blood', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,25 +81,25 @@ function BloodDonation() {
         credentials: 'include',
       });
 
-      if (!submitResponse.ok) {
-        const error = await submitResponse.json();
-        console.error('Submit Error:', error);
-        toast.error(error.error || 'Failed to submit blood request.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error Response:', errorData);
+        toast.error(errorData.error || 'Failed to submit request.');
       } else {
-        const result = await submitResponse.json();
-        toast.success(result.message || 'Blood request submitted successfully.');
-        const requestResponse = await fetch('http://localhost:2000/blood/requests', { credentials: 'include' });
+        const result = await response.json();
+        toast.success(result.message || 'Request submitted successfully!');
+        // Fetch updated request data after successful submission
+        const requestResponse = await fetch('http://localhost:2000/api/request-blood', { credentials: 'include' });
         if (requestResponse.ok) {
           const requestData = await requestResponse.json();
           setRequests(requestData);
         }
       }
     } catch (err) {
-      console.error('Error during blood request:', err);
+      console.error('Error during request:', err);
       toast.error('An error occurred. Please try again.');
     }
   };
-
 
   return (
     <div className="container mt-5">
@@ -175,6 +138,7 @@ function BloodDonation() {
                     <option value="O-">O-</option>
                   </select>
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="donateQuantity" style={{ color: '#1b558b' }}>
                     Quantity (ml)
@@ -188,6 +152,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="donorName" style={{ color: '#1b558b' }}>
                     Donor Name
@@ -201,6 +166,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="donorContact" style={{ color: '#1b558b' }}>
                     Contact Information
@@ -214,6 +180,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="donateLocation" style={{ color: '#1b558b' }}>
                     Location
@@ -227,6 +194,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <button
                   type="submit"
                   className="btn"
@@ -275,6 +243,7 @@ function BloodDonation() {
                     <option value="O-">O-</option>
                   </select>
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="requestQuantity" style={{ color: '#1b558b' }}>
                     Quantity (ml)
@@ -288,6 +257,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="patientName" style={{ color: '#1b558b' }}>
                     Patient Name
@@ -301,6 +271,21 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
+                <div className="form-group mb-3">
+                  <label htmlFor="patientLocation" style={{ color: '#1b558b' }}>
+                    Location (Hospital)
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="patientLocation"
+                    value={requestLocation}
+                    onChange={(e) => setRequestLocation(e.target.value)}
+                    required
+                  />
+                </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="patientContact" style={{ color: '#1b558b' }}>
                     Contact Information
@@ -314,6 +299,7 @@ function BloodDonation() {
                     required
                   />
                 </div>
+
                 <div className="form-group mb-3">
                   <label htmlFor="requestPriority" style={{ color: '#1b558b' }}>
                     Priority
@@ -328,6 +314,7 @@ function BloodDonation() {
                     <option value="High">High</option>
                   </select>
                 </div>
+
                 <button
                   type="submit"
                   className="btn"
@@ -345,10 +332,11 @@ function BloodDonation() {
           </div>
         </div>
       </div>
+
+      {/* Toast Notifications */}
       <ToastContainer />
     </div>
   );
 }
 
 export default BloodDonation;
-

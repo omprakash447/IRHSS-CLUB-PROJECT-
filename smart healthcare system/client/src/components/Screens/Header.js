@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaBars, FaSignOutAlt, FaTachometerAlt, FaTimes, FaUser } from 'react-icons/fa'; // Importing icons
+import { FaBars, FaCheckCircle, FaSignOutAlt, FaTachometerAlt, FaTimes, FaUser } from 'react-icons/fa'; // Importing icons
 import { Link, useNavigate } from 'react-router-dom';
 
 function Header() {
@@ -109,6 +109,12 @@ function Header() {
                     Dashboard
                   </Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link text-animate" to="/blood-request-check" style={{ padding: '10px 15px' }}>
+                    <FaCheckCircle className="me-2" size={20} />
+                    Check Blood Request
+                  </Link>
+                </li>
                 {/* User Icon Button */}
                 <li className="nav-item" style={{ position: 'relative' }} ref={userIconRef}>
                   <button
@@ -172,6 +178,12 @@ function Header() {
                   Dashboard
                 </Link>
               </li>
+              <li className="nav-item">
+                  <Link className="nav-link text-animate" to="/blood-request-check" style={{ padding: '10px 15px' }}>
+                    <FaCheckCircle className="me-2" size={20} />
+                    Check Blood Request
+                  </Link>
+                </li>
               <li className="nav-item" style={{ position: 'relative' }} ref={userIconRef}>
                 <button
                   className="nav-link text-animate"

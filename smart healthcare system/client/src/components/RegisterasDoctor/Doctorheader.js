@@ -4,11 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Doctorheader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [doctorInfo, setDoctorInfo] = useState(null); // Store doctor information
-  const [error, setError] = useState(null); // Error message
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar state
+  const [doctorInfo, setDoctorInfo] = useState(null);
+  const [error, setError] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch doctor profile data
   useEffect(() => {
     const fetchDoctorProfile = async () => {
       try {
@@ -20,7 +21,7 @@ function Doctorheader() {
         if (!response.ok) throw new Error('Failed to fetch doctor profile');
 
         const data = await response.json();
-        setDoctorInfo(data); // Set doctor data
+        setDoctorInfo(data);
       } catch (err) {
         setError(err.message);
       }
@@ -42,6 +43,11 @@ function Doctorheader() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleNavClick = () => {
+    // Close the sidebar when a navigation item is clicked (for mobile)
+    setIsSidebarOpen(false);
+  };
+
   const modalStyle = {
     position: 'absolute',
     top: '60px',
@@ -60,12 +66,11 @@ function Doctorheader() {
     <>
       <nav className="navbar navbar-expand-lg navbar-dark fixed-top" style={{ backgroundColor: '#1b558b' }}>
         <div className="container">
-          {/* Dashboard Brand */}
           <Link className="navbar-brand" to="/doctor-screen" style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
             Doctor Dashboard
           </Link>
 
-          {/* Toggle Sidebar for Mobile */}
+          {/* Mobile Sidebar Toggle */}
           <button
             className="navbar-toggler"
             type="button"
@@ -78,23 +83,23 @@ function Doctorheader() {
           {/* Navigation Links */}
           <div className={`collapse navbar-collapse ${isSidebarOpen ? 'd-none' : ''}`} id="navbarNav">
             <ul className="navbar-nav ms-auto">
-              {/* Blood Donation */}
+              {/* Blood Donations */}
               <li className="nav-item">
-                <Link className="nav-link" to="/blood-donations-dr-page">
+                <Link className="nav-link" to="/blood-donations-dr-page" onClick={handleNavClick}>
                   <FaHandHoldingHeart className="me-2" size={20} />
                   Blood Donations
                 </Link>
               </li>
               {/* Blood Requests */}
               <li className="nav-item">
-                <Link className="nav-link" to="/blood-requests-dr-page">
+                <Link className="nav-link" to="/blood-requests-dr-page" onClick={handleNavClick}>
                   <FaBriefcaseMedical className="me-2" size={20} />
                   Blood Requests
                 </Link>
               </li>
               {/* Emergency Cases */}
               <li className="nav-item">
-                <Link className="nav-link" to="/accident-dr-page">
+                <Link className="nav-link" to="/accident-dr-page" onClick={handleNavClick}>
                   <FaAmbulance className="me-2" size={20} />
                   Accidents / Emergencies
                 </Link>
@@ -104,11 +109,7 @@ function Doctorheader() {
                 <button
                   className="btn text-white d-flex align-items-center"
                   onClick={toggleModal}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   <FaUser size={24} className="me-2" />
                   {doctorInfo && <span style={{ fontSize: '1rem' }}>{doctorInfo.name}</span>}
@@ -137,19 +138,34 @@ function Doctorheader() {
         >
           <ul className="list-unstyled p-3">
             <li>
-              <Link to="/blood-donations-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link
+                to="/blood-donations-dr-page"
+                className="text-white"
+                style={{ textDecoration: 'none', padding: '15px' }}
+                onClick={handleNavClick}
+              >
                 <FaHandHoldingHeart className="me-2" />
                 Blood Donations
               </Link>
             </li>
             <li>
-              <Link to="/blood-requests-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link
+                to="/blood-requests-dr-page"
+                className="text-white"
+                style={{ textDecoration: 'none', padding: '15px' }}
+                onClick={handleNavClick}
+              >
                 <FaBriefcaseMedical className="me-2" />
                 Blood Requests
               </Link>
             </li>
             <li>
-              <Link to="/accident-dr-page" className="text-white" style={{ textDecoration: 'none', padding: '15px' }}>
+              <Link
+                to="/accident-dr-page"
+                className="text-white"
+                style={{ textDecoration: 'none', padding: '15px' }}
+                onClick={handleNavClick}
+              >
                 <FaAmbulance className="me-2" />
                 Accidents / Emergencies
               </Link>

@@ -5,6 +5,7 @@ import DrBloodDonation from './Doctorspecificscreen/BloodDonation';
 import DrBloodrequests from './Doctorspecificscreen/DrBloodRequests';
 import AccidentDetection from './Features/AccidentDetection';
 import BloodDonation from './Features/BloodDonation';
+import FetchRequest from './Features/Fetchrequest';
 import Doctorheader from './RegisterasDoctor/Doctorheader';
 import DoctorLogin from './RegisterasDoctor/DoctorLogin';
 import DoctorRegister from './RegisterasDoctor/DoctorRegister';
@@ -35,6 +36,7 @@ function RoutesOfThePage() {
                     <Route path="/dashboard" element={<><Header /><Dashboard /></>} />
                     <Route path="/blood-donation" element={<><Header /><BloodDonation /></>} />
                     <Route path="/accident-detection" element={<><Header /><AccidentDetection /></>} />
+                    <Route path='/blood-request-check' element={<><Header /><FetchRequest /></>} />
 
                     {/* Doctor page routes */}
                     <Route path='/blood-donations-dr-page' element={<><Doctorheader /><DrBloodDonation /></>} />
