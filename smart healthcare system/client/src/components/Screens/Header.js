@@ -79,7 +79,7 @@ function Header() {
     <nav className="navbar navbar-expand-lg navbar-dark fixed-top sticky-top" style={{ backgroundColor: '#1b558b' }}>
       <div className="container">
         <Link className="navbar-brand title-animate" to="/landingpage" style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-          Smart Healthcare System
+          EHRSS
         </Link>
 
         {/* Hamburger icon (only visible on smaller devices) */}
@@ -179,11 +179,11 @@ function Header() {
                 </Link>
               </li>
               <li className="nav-item">
-                  <Link className="nav-link text-animate" to="/blood-request-check" style={{ padding: '10px 15px' }}>
-                    <FaCheckCircle className="me-2" size={20} />
-                    Check Blood Request
-                  </Link>
-                </li>
+                <Link className="nav-link text-animate" to="/blood-request-check" style={{ padding: '10px 15px' }}>
+                  <FaCheckCircle className="me-2" size={20} />
+                  Check Blood Request
+                </Link>
+              </li>
               <li className="nav-item" style={{ position: 'relative' }} ref={userIconRef}>
                 <button
                   className="nav-link text-animate"
