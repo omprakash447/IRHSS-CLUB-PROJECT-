@@ -1,6 +1,5 @@
 import React from "react";
-// import landingpageimage1 from "../components/assets/landingpageimg1.jpg"; // Ensure path is correct
-import landingpageimage1 from "../assets/landingpageimg1.jpg";
+import landingpageimage1 from "../assets/SWASTHYASETU.gif";
 
 function LandingPage() {
   return (
@@ -22,8 +21,8 @@ function LandingPage() {
             alt="Smart Healthcare"
             className="img-fluid rounded mb-4"
             style={{
-              maxWidth: "90%",
-              height: "auto",
+              width: "80vw", // Set width to 80% of the viewport width
+              height: "auto", // Maintain aspect ratio
               objectFit: "cover",
               borderRadius: "10px",
             }}

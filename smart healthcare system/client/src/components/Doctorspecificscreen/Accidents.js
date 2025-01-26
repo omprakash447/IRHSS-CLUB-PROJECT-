@@ -1,27 +1,68 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import React, { useEffect, useState } from 'react';
+import { MapContainer, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Fix for default marker icons in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
+// Custom icons for accident and doctor locations
+const accidentIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const doctorIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
 function Accidents() {
   const [accidents, setAccidents] = useState([]);
+  const [showMap, setShowMap] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState({ location: null, coordinates: [0, 0] });
+  const [isLoading, setIsLoading] = useState(false);
+  const [doctorLocation, setDoctorLocation] = useState(null);
 
   // Fetch accidents data from the backend
-  useEffect(() => {
-    const fetchAccidents = async () => {
-      try {
-        const response = await fetch('http://localhost:2000/api/accidents');
-        if (response.ok) {
-          const data = await response.json();
-          setAccidents(data.accidents || []);
-        } else {
-          toast.error('Failed to fetch accidents. Please try again later.');
-        }
-      } catch (error) {
-        console.error('Error fetching accidents:', error);
-        toast.error('Error fetching accidents. Please try again later.');
-      }
-    };
+  const fetchAccidents = async () => {
+    try {
+      const response = await fetch('http://localhost:2000/api/accidents');
+      if (response.ok) {
+        const data = await response.json();
 
+        // Check localStorage for disabled states and update data accordingly
+        const updatedAccidents = data.accidents.map((accident) => ({
+          ...accident,
+          isDisabled: localStorage.getItem(`accident_${accident._id}`) === 'true',
+        }));
+
+        setAccidents(updatedAccidents || []);
+      } else {
+        toast.error('Failed to fetch accidents. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error fetching accidents:', error);
+      toast.error('Error fetching accidents. Please try again later.');
+    }
+  };
+
+  useEffect(() => {
     fetchAccidents();
   }, []);
 
@@ -33,16 +74,20 @@ function Accidents() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Checked Out' }),
       });
-  
+
       if (response.ok) {
         const updatedAccident = await response.json();
+
         // Update local state
         setAccidents((prevAccidents) =>
           prevAccidents.map((accident) =>
             accident._id === updatedAccident._id ? updatedAccident : accident
           )
         );
-        // Notification for successful update
+
+        // Save the disabled state in localStorage
+        localStorage.setItem(`accident_${id}`, true);
+
         toast.success('Accident checked out successfully.');
       } else {
         const errorText = await response.text();
@@ -53,7 +98,40 @@ function Accidents() {
       toast.error('Error updating accident. Please try again.');
     }
   };
-  
+
+  // Handle Track Button Click
+  const handleTrack = async (location) => {
+    setIsLoading(true);
+    const coordinates = await getCoordinates(location);
+    setSelectedLocation({ location, coordinates });
+    setShowMap(true);
+    setIsLoading(false);
+  };
+
+  // Handle Doctor's Location Button Click
+  const handleDoctorLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setDoctorLocation([latitude, longitude]);
+        },
+        (error) => {
+          toast.error('Error fetching your location. Please enable location services.');
+          console.error('Error fetching location:', error);
+        }
+      );
+    } else {
+      toast.error('Geolocation is not supported by this browser.');
+    }
+  };
+
+  // Close the Map Modal
+  const closeMap = () => {
+    setShowMap(false);
+    setSelectedLocation({ location: null, coordinates: [0, 0] });
+    setDoctorLocation(null);
+  };
 
   // Convert time to a readable format
   const formatTime = (time) => {
@@ -67,6 +145,27 @@ function Accidents() {
       minute: '2-digit',
       second: '2-digit',
     });
+  };
+
+  // Fetch coordinates using Nominatim API
+  const getCoordinates = async (location) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
+      );
+      const data = await response.json();
+      if (data.length > 0) {
+        const { lat, lon } = data[0];
+        return [parseFloat(lat), parseFloat(lon)];
+      } else {
+        toast.error(`Location "${location}" not found.`);
+        return [0, 0]; // Default to [0, 0] if location not found
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      toast.error('Error fetching coordinates. Please try again.');
+      return [0, 0]; // Default to [0, 0] in case of an error
+    }
   };
 
   return (
@@ -128,18 +227,40 @@ function Accidents() {
                     </span>
                   </div>
                   <div>
-                    {/* Conditional Rendering for Checkout Button */}
-                    {accident.status !== 'Checked Out' && (
+                    {/* Conditional Rendering for Buttons */}
+                    {accident.status !== 'Checked Out' && !accident.isDisabled && (
+                      <>
+                        <button
+                          className="btn btn-primary me-2"
+                          style={{
+                            backgroundColor: '#1b558b',
+                            border: 'none',
+                            padding: '10px 20px',
+                          }}
+                          onClick={() => handleCheckout(accident._id)}
+                        >
+                          Mark as Checked Out
+                        </button>
+                        <button
+                          className="btn btn-info"
+                          style={{
+                            padding: '10px 20px',
+                          }}
+                          onClick={() => handleTrack(accident.location)}
+                        >
+                          Track
+                        </button>
+                      </>
+                    )}
+                    {accident.isDisabled && (
                       <button
-                        className="btn btn-primary"
+                        className="btn btn-secondary"
                         style={{
-                          backgroundColor: '#1b558b',
-                          border: 'none',
                           padding: '10px 20px',
                         }}
-                        onClick={() => handleCheckout(accident._id)}
+                        disabled
                       >
-                        Mark as Checked Out
+                        Already Checked Out
                       </button>
                     )}
                   </div>
@@ -153,6 +274,94 @@ function Accidents() {
           </ul>
         </div>
       </div>
+
+      {/* Map Modal */}
+      {showMap && selectedLocation && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#fff',
+              padding: '20px',
+              borderRadius: '8px',
+              width: '80%',
+              maxWidth: '800px',
+              position: 'relative',
+            }}
+          >
+            <button
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'none',
+                border: 'none',
+                fontSize: '18px',
+                cursor: 'pointer',
+              }}
+              onClick={closeMap}
+            >
+              ×
+            </button>
+            <h3 style={{ marginBottom: '20px' }}>Location: {selectedLocation.location}</h3>
+            <button
+              className="btn btn-success mb-3"
+              style={{
+                padding: '10px 20px',
+              }}
+              onClick={handleDoctorLocation}
+            >
+              Your Location
+            </button>
+            <div style={{ height: '400px', width: '100%', borderRadius: '8px' }}>
+              <MapContainer
+                center={selectedLocation.coordinates}
+                zoom={13}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={selectedLocation.coordinates} icon={accidentIcon}>
+                  <Popup>{selectedLocation.location}</Popup>
+                </Marker>
+                {doctorLocation && (
+                  <>
+                    <Marker position={doctorLocation} icon={doctorIcon}>
+                      <Popup>Your Location</Popup>
+                    </Marker>
+                    <Polyline
+                      positions={[doctorLocation, selectedLocation.coordinates]}
+                      color="red"
+                    />
+                  </>
+                )}
+              </MapContainer>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Spinner */}
+      {isLoading && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <p>Loading map...</p>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );

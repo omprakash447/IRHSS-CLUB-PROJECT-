@@ -460,6 +460,91 @@ p {
 }
 
 
+/* chat bot */
+/* Chat Bot Icon Styling */
+.chat-bot-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  background-color: #007bff; /* Blue background */
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.chat-bot-icon:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.chat-bot-icon img {
+  width: 40px;
+  height: 40px;
+  filter: brightness(0) invert(1); /* Make the icon white */
+}
+
+/* Modal Styling */
+.custom-modal .modal-content {
+  border: none; /* Remove white border */
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden; /* Hide scrollbar */
+}
+
+.modal-header-custom {
+  border-bottom: none; /* Remove header border */
+  padding: 10px 15px;
+  background-color: #007bff; /* Blue header */
+  color: white;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.modal-header-custom .close {
+  color: white; /* White close button */
+  opacity: 0.8;
+  margin-left: auto; /* Push the close button to the right */
+}
+
+.modal-header-custom .close:hover {
+  opacity: 1;
+}
+
+.modal-body-custom {
+  padding: 0; /* Remove padding to make iframe fit perfectly */
+  overflow: hidden; /* Hide scrollbar */
+}
+
+.modal-footer-custom {
+  border-top: none; /* Remove footer border */
+  padding: 10px 15px;
+  background-color: #f8f9fa; /* Light gray footer */
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.modal-footer-custom .btn-primary {
+  background-color: #007bff; /* Blue button */
+  border: none;
+}
+
+.modal-footer-custom .btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Hide scrollbar for the modal */
+.custom-modal::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+
+.custom-modal {
+  -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+
 
 
 

@@ -1,5 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is imported
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Tooltip } from 'chart.js';
 import React, { useEffect, useState } from 'react';
+import { Bar, Doughnut, Pie } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 function DrBloodDonation() {
   const [donations, setDonations] = useState([]);
@@ -39,12 +44,113 @@ function DrBloodDonation() {
     fetchData();
   }, []);
 
+  // Prepare data for the pie chart
+  const pieChartData = {
+    labels: Object.keys(totals),
+    datasets: [
+      {
+        label: 'Total Quantity (ml)',
+        data: Object.values(totals).map((item) => item.totalQuantity),
+        backgroundColor: [
+          '#FF6384', // Red
+          '#36A2EB', // Blue
+          '#FFCE56', // Yellow
+          '#4BC0C0', // Teal
+          '#9966FF', // Purple
+          '#FF9F40', // Orange
+        ],
+        hoverBackgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40',
+        ],
+      },
+    ],
+  };
+
+  // Prepare data for the circle chart (Doughnut chart)
+  const circleChartData = {
+    labels: Object.keys(totals),
+    datasets: [
+      {
+        label: 'Total Donors',
+        data: Object.values(totals).map((item) => item.donorCount),
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40',
+        ],
+        hoverBackgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40',
+        ],
+      },
+    ],
+  };
+
+  // Prepare data for the bar graph (donations over time)
+  const barChartData = {
+    labels: donations.map((donation) => new Date(donation.date).toLocaleDateString()), // Extract dates
+    datasets: [
+      {
+        label: 'Blood Donated (ml)',
+        data: donations.map((donation) => donation.quantity), // Extract quantities
+        backgroundColor: '#36A2EB', // Blue color for bars
+        borderColor: '#36A2EB',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Custom options for the charts to make them smaller and consistent
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false, // Disable aspect ratio to control size
+    plugins: {
+      legend: {
+        position: 'bottom', // Move legend to the bottom
+        labels: {
+          boxWidth: 10, // Smaller legend boxes
+          font: {
+            size: 10, // Smaller font size
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Date', // X-axis label
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Quantity (ml)', // Y-axis label
+        },
+        beginAtZero: true, // Start Y-axis from 0
+      },
+    },
+  };
+
   return (
-    <div className="container" style={{ maxWidth: '90%'  , marginTop:"100px"}}>
+    <div className="container" style={{ maxWidth: '90%', marginTop: '100px' }}>
       <h2 className="text-center mb-4" style={{ color: '#007bff' }}>
         Blood Donation Records
       </h2>
 
+      {/* Table for donation records */}
       <div className="table-responsive mb-5">
         <table className="table table-hover table-striped table-bordered">
           <thead className="table-primary">
@@ -70,11 +176,41 @@ function DrBloodDonation() {
         </table>
       </div>
 
+      {/* Statistics Section */}
       <h4 className="mt-5 mb-3" style={{ color: '#007bff' }}>Statistics</h4>
       <div className="mt-3">
         <p className="lead">
           <strong>Total Donors:</strong> {totalDonors}
         </p>
+
+        {/* Charts Section */}
+        <div className="row">
+          {/* Pie Chart */}
+          <div className="col-md-6 mb-5">
+            <h5>Total Quantity by Blood Type (ml)</h5>
+            <div style={{ width: '100%', height: '300px' }}> {/* Fixed size container */}
+              <Pie data={pieChartData} options={chartOptions} />
+            </div>
+          </div>
+
+          {/* Doughnut Chart */}
+          <div className="col-md-6 mb-5">
+            <h5>Total Donors by Blood Type</h5>
+            <div style={{ width: '100%', height: '300px' }}> {/* Fixed size container */}
+              <Doughnut data={circleChartData} options={chartOptions} />
+            </div>
+          </div>
+        </div>
+
+        {/* Bar Graph Section */}
+        <div className="mb-5">
+          <h5>Blood Donations Over Time</h5>
+          <div style={{ width: '100%', height: '300px' }}> {/* Fixed size container */}
+            <Bar data={barChartData} options={chartOptions} />
+          </div>
+        </div>
+
+        {/* Table for blood type totals */}
         <div className="table-responsive">
           <table className="table table-hover table-striped table-bordered">
             <thead className="table-success">

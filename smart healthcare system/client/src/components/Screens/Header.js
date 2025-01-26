@@ -79,7 +79,9 @@ function Header() {
     <nav className="navbar navbar-expand-lg navbar-dark fixed-top sticky-top" style={{ backgroundColor: '#1b558b' }}>
       <div className="container">
         <Link className="navbar-brand title-animate" to="/landingpage" style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-          EHRSS
+          <div>
+            <img src="https://cdn-icons-png.flaticon.com/512/9338/9338304.png" alt="" style={{ height: "40px", width: "40px", boxShadow: "0px 0px 10px black", border: "2px solid #1b558b", borderRadius: "50%" , marginRight:"10px" }} />Swasthya Setu
+          </div>
         </Link>
 
         {/* Hamburger icon (only visible on smaller devices) */}
@@ -115,6 +117,18 @@ function Header() {
                     Check Blood Request
                   </Link>
                 </li>
+
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-animate"
+                    to="/blood-donation-check"
+                    style={{ padding: "10px 15px" }}
+                  >
+                    <FaCheckCircle className="me-2" size={20} />
+                    Get the Donors
+                  </Link>
+                </li>
+
                 {/* User Icon Button */}
                 <li className="nav-item" style={{ position: 'relative' }} ref={userIconRef}>
                   <button
@@ -182,6 +196,16 @@ function Header() {
                 <Link className="nav-link text-animate" to="/blood-request-check" style={{ padding: '10px 15px' }}>
                   <FaCheckCircle className="me-2" size={20} />
                   Check Blood Request
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className="nav-link text-animate"
+                  to="/blood-donation-check"
+                  style={{ padding: "10px 15px" }}
+                >
+                  <FaCheckCircle className="me-2" size={20} />
+                  Get the Donors
                 </Link>
               </li>
               <li className="nav-item" style={{ position: 'relative' }} ref={userIconRef}>
