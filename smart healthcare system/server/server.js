@@ -3,13 +3,14 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const cors = require("cors");
+require("socket.io");
 
 // Initialize Express server
 const server = express();
 
 // Middleware
 server.use(express.json());
-server.use(cors({ origin: "http://localhost:3000", credentials: true }));  
+server.use(cors({ origin: "http://localhost:3002", credentials: true }));  
 server.use(express.urlencoded({ extended: true }));
 
 
@@ -31,7 +32,7 @@ server.use(
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/SHC")
+  .connect(process.env.MONGO_URI || "mongodb+srv://supriyadhal50:n6Ef2fti2ezb99f0@cluster0.pgn4a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/SHC")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -666,6 +667,7 @@ server.get("/blood/request/check-availability", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 
