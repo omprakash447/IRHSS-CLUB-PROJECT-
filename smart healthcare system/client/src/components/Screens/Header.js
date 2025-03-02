@@ -23,7 +23,7 @@ function Header() {
   useEffect(() => {
     const handelaccessuser = async () => {
       try {
-        const response = await fetch("http://localhost:2000/user", {
+        const response = await fetch("http://localhost:2000/api/auth/user", {
           credentials: "include",
         });
         if (response.ok) {

@@ -72,7 +72,8 @@ function Accidents() {
       const response = await fetch(`http://localhost:2000/api/accidents/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Checked Out' }),
+        body: JSON.stringify({ status: 'Checkout' }), // Changed to match schema enum
+        credentials: 'include', // Added for session authentication if required
       });
 
       if (response.ok) {
@@ -90,8 +91,8 @@ function Accidents() {
 
         toast.success('Accident checked out successfully.');
       } else {
-        const errorText = await response.text();
-        toast.error(`Failed to update status: ${errorText}`);
+        const errorData = await response.json();
+        toast.error(`Failed to update status: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
       console.error('Error updating accident:', error);
@@ -218,9 +219,8 @@ function Accidents() {
                     <small className="text-muted">Reported at: {formatTime(accident.time)}</small>
                     <br />
                     <span
-                      className={`badge ${
-                        accident.status === 'Pending' ? 'bg-warning' : 'bg-success'
-                      }`}
+                      className={`badge ${accident.status === 'Pending' ? 'bg-warning' : 'bg-success'
+                        }`}
                       style={{ fontSize: '14px', marginTop: '10px' }}
                     >
                       {accident.status}

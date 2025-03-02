@@ -15,7 +15,7 @@ function Register() {
 
     try {
       // Send POST request to backend
-      const response = await fetch('http://localhost:2000/userAuth', {
+      const response = await fetch('http://localhost:2000/api/auth/userAuth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

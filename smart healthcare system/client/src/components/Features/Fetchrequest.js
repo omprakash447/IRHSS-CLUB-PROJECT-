@@ -11,7 +11,7 @@ function FetchRequest() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await fetch('http://localhost:2000/api/request-blood', {
+        const response = await fetch('http://localhost:2000/api/blood/request-blood', {
           credentials: 'include', // Include credentials if needed
         });
 

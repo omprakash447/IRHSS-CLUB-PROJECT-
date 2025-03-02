@@ -13,7 +13,7 @@ function Doctorheader() {
   useEffect(() => {
     const fetchDoctorProfile = async () => {
       try {
-        const response = await fetch('http://localhost:2000/doctor-profile', {
+        const response = await fetch('http://localhost:2000/api/doctor/doctor-profile', {
           method: 'GET',
           credentials: 'include',
         });

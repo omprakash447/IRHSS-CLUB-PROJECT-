@@ -15,7 +15,7 @@ function DrBloodDonation() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:2000/blood/donations', { credentials: 'include' });
+        const response = await fetch('http://localhost:2000/api/blood/donations', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setDonations(data);

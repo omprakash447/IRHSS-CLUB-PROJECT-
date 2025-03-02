@@ -14,7 +14,7 @@ function Login() {
     setError(''); // Clear previous error message
     try {
       // Send POST request to backend
-      const response = await fetch('http://localhost:2000/login', {
+      const response = await fetch('http://localhost:2000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

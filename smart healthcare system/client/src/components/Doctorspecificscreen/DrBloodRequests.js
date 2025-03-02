@@ -12,7 +12,7 @@ function BloodRequestList() {
     const fetchBloodRequests = async () => {
       try {
         setLoading(true);  // Start loading
-        const response = await fetch('http://localhost:2000/api/request-blood');  // Fetch the blood requests
+        const response = await fetch('http://localhost:2000/api/blood/request-blood');  // Fetch the blood requests
         if (!response.ok) {
           throw new Error('Failed to fetch blood requests');
         }
@@ -39,7 +39,7 @@ function BloodRequestList() {
       }
 
       // Send request to backend to mark the request as accessed
-      const response = await fetch(`http://localhost:2000/api/mark-request-accessed/${requestId}`, {
+      const response = await fetch(`http://localhost:2000/api/blood/mark-request-accessed/${requestId}`, {
         method: 'PATCH',  // Use PATCH method to update the request
         headers: {
           'Content-Type': 'application/json',

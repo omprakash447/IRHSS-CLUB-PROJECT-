@@ -35,7 +35,7 @@ function BloodDonation() {
     };
 
     try {
-      const response = await fetch('http://localhost:2000/blood/donate', {
+      const response = await fetch('http://localhost:2000/api/blood/donate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ function BloodDonation() {
     };
 
     try {
-      const response = await fetch('http://localhost:2000/api/request-blood', {
+      const response = await fetch('http://localhost:2000/api/blood/request-blood', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ function BloodDonation() {
         const result = await response.json();
         toast.success(result.message || 'Request submitted successfully!');
         // Fetch updated request data after successful submission
-        const requestResponse = await fetch('http://localhost:2000/api/request-blood', { credentials: 'include' });
+        const requestResponse = await fetch('http://localhost:2000/api/blood/request-blood', { credentials: 'include' });
         if (requestResponse.ok) {
           const requestData = await requestResponse.json();
           setRequests(requestData);

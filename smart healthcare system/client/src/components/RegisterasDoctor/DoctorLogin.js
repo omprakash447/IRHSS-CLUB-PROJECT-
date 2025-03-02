@@ -12,7 +12,7 @@ function DoctorLogin() {
     e.preventDefault();
     try {
       // API call to login endpoint
-      const response = await fetch("http://localhost:2000/doctor-login", {
+      const response = await fetch("http://localhost:2000/api/doctor/doctor-login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -17,7 +17,7 @@ function DoctorRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:2000/doctor-registration", {
+      const response = await fetch("http://localhost:2000/api/doctor/doctor-registration", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
